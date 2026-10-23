@@ -1,13 +1,26 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>My Upgraded Web Game</title>
+    <title>Matrix Clicker Quest</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
             background-color: #f0f8ff;
             text-align: center;
             padding-top: 30px;
+            margin: 0;
+            overflow: hidden;
+            transition: background-color 1s;
+        }
+        /* 🕶️ The Secret Matrix Background Canvas */
+        #matrix-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            display: none;
         }
         .game-box {
             background-color: white;
@@ -16,6 +29,9 @@
             padding: 30px;
             border-radius: 15px;
             box-shadow: 0px 5px 15px rgba(0,0,0,0.1);
+            position: relative;
+            z-index: 10;
+            transition: all 0.5s;
         }
         .shop-box {
             background-color: #f1f2f6;
@@ -23,6 +39,7 @@
             padding: 15px;
             border-radius: 10px;
             text-align: left;
+            transition: all 0.5s;
         }
         button {
             background-color: #ff4757;
@@ -35,9 +52,10 @@
             font-weight: bold;
             width: 100%;
             margin-bottom: 10px;
+            transition: transform 0.1s;
         }
         button:active {
-            transform: scale(0.98);
+            transform: scale(0.96);
         }
         .shop-btn {
             background-color: #2ed573;
@@ -46,25 +64,28 @@
         }
         input {
             margin-top: 15px;
-            padding: 5px;
+            padding: 8px;
             text-align: center;
             border-radius: 5px;
             border: 1px solid #ccc;
             width: 80%;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
 
+    <!-- This canvas draws the falling code effect -->
+    <canvas id="matrix-canvas"></canvas>
+
     <div class="game-box" id="box">
-        <h1>Super Clicker!</h1>
+        <h1 id="title-text">Super Clicker!</h1>
         <h2 id="score-text">Score: 0</h2>
         <p id="stats-text">Click Power: +1 | Auto-Bots: 0</p>
         
-        <button onclick="addPoint()">CLICK ME!</button>
+        <button id="main-btn" onclick="addPoint()">CLICK ME!</button>
         
-        <!-- THE UPGRADE SHOP -->
-        <div class="shop-box">
+        <div class="shop-box" id="shop">
             <h3>🛒 Upgrade Shop</h3>
             <button class="shop-btn" id="upgrade-click-btn" onclick="buyClickUpgrade()">
                 +2 Click Power (Cost: 15)
@@ -74,20 +95,18 @@
             </button>
         </div>
 
-        <p>Got a cheat code?</p>
+        <p id="cheat-prompt">Got a cheat code?</p>
         <input type="text" id="code-input" placeholder="Enter code..." oninput="checkCode()">
     </div>
 
     <script>
         let score = 0;
         let pointsPerClick = 1;
-        
         let clickUpgradeCost = 15;
-        
         let autoBots = 0;
         let botCost = 30;
+        let matrixActive = false;
 
-        // 🔊 Safe Sound Engine
         function makeArcadeSound(pitch, length) {
             try {
                 let audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -104,7 +123,6 @@
             } catch(e) {}
         }
 
-        // Update the screen text
         function updateScreen() {
             document.getElementById("score-text").innerText = "Score: " + score;
             document.getElementById("stats-text").innerText = "Click Power: +" + pointsPerClick + " | Auto-Bots: " + autoBots;
@@ -112,68 +130,121 @@
             document.getElementById("upgrade-bot-btn").innerText = "Buy Auto-Bot (Cost: " + botCost + ")";
         }
 
-        // Click the main button
         function addPoint() {
             score = score + pointsPerClick;
-            makeArcadeSound(523, 0.08); // Normal click sound
+            makeArcadeSound(matrixActive ? 800 : 523, 0.08); 
             updateScreen();
         }
 
-        // Upgrade Click Power
         function buyClickUpgrade() {
             if (score >= clickUpgradeCost) {
                 score = score - clickUpgradeCost;
                 pointsPerClick = pointsPerClick + 2;
-                clickUpgradeCost = Math.round(clickUpgradeCost * 1.5); // Makes the next upgrade cost more!
-                makeArcadeSound(880, 0.15); // Cha-ching purchase sound
+                clickUpgradeCost = Math.round(clickUpgradeCost * 1.5);
+                makeArcadeSound(880, 0.15);
                 updateScreen();
             } else {
                 alert("❌ Not enough points!");
             }
         }
 
-        // Buy an Auto-Clicker Bot
         function buyBotUpgrade() {
             if (score >= botCost) {
                 score = score - botCost;
                 autoBots = autoBots + 1;
-                botCost = Math.round(botCost * 1.5); // Makes the next bot cost more!
-                makeArcadeSound(880, 0.15); // Purchase sound
+                botCost = Math.round(botCost * 1.5);
+                makeArcadeSound(880, 0.15);
                 updateScreen();
             } else {
                 alert("❌ Not enough points!");
             }
         }
 
-        // 🤖 AUTO-CLICKER LOOP: This code runs every 1 second (1000 milliseconds)
+        // Auto-Clicker loop
         setInterval(function() {
             if (autoBots > 0) {
                 score = score + autoBots;
-                makeArcadeSound(350, 0.05); // Quiet low beep when bot clicks for you
+                makeArcadeSound(matrixActive ? 400 : 350, 0.04);
                 updateScreen();
             }
         }, 1000);
 
-        // Secret Cheat Code
+        // 🟢 MATRIX FALLING CODE ENGINE
+        function startMatrixAnimation() {
+            const canvas = document.getElementById("matrix-canvas");
+            const ctx = canvas.getContext("2d");
+
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            const alphabet = "01ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$#@+=-%*";
+            const fontSize = 16;
+            const columns = canvas.width / fontSize;
+
+            const rainDrops = [];
+            for (let x = 0; x < columns; x++) {
+                rainDrops[x] = 1;
+            }
+
+            function draw() {
+                ctx.fillStyle = "rgba(0, 0, 0, 0.05)"; // Leaves a trail
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                ctx.fillStyle = "#0F0"; // Matrix Green text
+                ctx.font = fontSize + "px monospace";
+
+                for (let i = 0; i < rainDrops.length; i++) {
+                    const text = alphabet.charAt(Math.floor(random(0, alphabet.length)));
+                    ctx.fillText(text, i * fontSize, rainDrops[i] * fontSize);
+
+                    if (rainDrops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                        rainDrops[i] = 0;
+                    }
+                    rainDrops[i]++;
+                }
+            }
+            
+            function random(min, max) {
+                return Math.random() * (max - min) + min;
+            }
+
+            setInterval(draw, 30);
+        }
+
         function checkCode() {
             let typedText = document.getElementById("code-input").value;
-            if (typedText === "999") {
+            if (typedText === "999" && !matrixActive) {
+                matrixActive = true;
                 pointsPerClick = 100;
-                score = score + 1000; // Gives you a massive pile of points instantly!
-                
-                makeArcadeSound(523, 0.15);
-                setTimeout(() => makeArcadeSound(659, 0.15), 100);
-                setTimeout(() => makeArcadeSound(784, 0.3), 200);
+                score = score + 5000; // Gives huge points!
 
-                document.body.style.backgroundColor = "#1e272e";
-                document.getElementById("box").style.backgroundColor = "#3d3d3d";
-                document.getElementById("box").style.color = "#00d2d3";
-                alert("🔓 CHEAT UNLOCKED! +1,000 Points and Mega Click Power!");
-                document.getElementById("code-input").value = ""; // Clears the box
+                // Play hacker sound sequence
+                makeArcadeSound(400, 0.2);
+                setTimeout(() => makeArcadeSound(600, 0.2), 150);
+                setTimeout(() => makeArcadeSound(900, 0.4), 300);
+
+                // Transform game UI to Dark Neon Cyberpunk style
+                document.body.style.backgroundColor = "black";
+                document.getElementById("matrix-canvas").style.display = "block";
+                
+                let box = document.getElementById("box");
+                box.style.backgroundColor = "rgba(15, 15, 15, 0.9)";
+                box.style.color = "#00ff66";
+                box.style.boxShadow = "0px 0px 30px #00ff66";
+                box.style.border = "2px solid #00ff66";
+
+                document.getElementById("shop").style.backgroundColor = "#222";
+                document.getElementById("main-btn").style.backgroundColor = "#00ff66";
+                document.getElementById("main-btn").style.color = "black";
+                document.getElementById("title-text").innerText = " mainframe HACKED ";
+                
+                document.getElementById("code-input").style.display = "none";
+                document.getElementById("cheat-prompt").style.display = "none";
+
+                startMatrixAnimation();
                 updateScreen();
             }
         }
     </script>
-
 </body>
 </html>
