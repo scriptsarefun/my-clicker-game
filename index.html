@@ -148,14 +148,14 @@
             } catch(e) {}
         }
 
-        // 🎵 FIXED MUSIC ENGINE BLOCK
+        // 🎵 TRACKER UPDATED WITH REAL MUSIC NOTES NOW!
         function toggleMusic() {
             if (musicInterval) {
                 clearInterval(musicInterval);
                 musicInterval = null;
                 return;
             }
-            let notes =; // Clean audio notes array
+            let notes =; // C chord arpeggio loop
             let beat = 0;
             musicInterval = setInterval(() => {
                 let pitch = matrixActive ? notes[beat % notes.length] * 0.5 : notes[beat % notes.length];
@@ -236,4 +236,3 @@
                 makeArcadeSound(200, 0.4, 'sawtooth');
                 
                 document.body.style.background = "black";
-                document.getElementById("matrix-canvas").style.display = "block";
