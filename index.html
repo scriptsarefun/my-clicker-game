@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Un-Stoppable Web Game</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f8ff;
+            text-align: center;
+            padding-top: 50px;
+        }
+        .game-box {
+            background-color: white;
+            width: 300px;
+            margin: 0 auto;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0px 5px 15px rgba(0,0,0,0.1);
+        }
+        button {
+            background-color: #ff4757;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        button:active {
+            transform: scale(0.95);
+        }
+        input {
+            margin-top: 20px;
+            padding: 5px;
+            text-align: center;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="game-box" id="box">
+        <h1>Clicker Game!</h1>
+        <h2 id="score-text">Score: 0</h2>
+        
+        <button onclick="addPoint()">CLICK ME!</button>
+        
+        <br><br>
+        <p>Got a cheat code?</p>
+        <input type="text" id="code-input" placeholder="Enter code..." oninput="checkCode()">
+    </div>
+
+    <script>
+        let score = 0;
+        let pointsPerClick = 1;
+
+        function makeArcadeSound(pitch, length) {
+            try {
+                let audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                let osc = audioCtx.createOscillator();
+                let volume = audioCtx.createGain();
+                
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(pitch, audioCtx.currentTime);
+                
+                volume.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                volume.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + length);
+                
+                osc.connect(volume);
+                volume.connect(audioCtx.destination);
+                
+                osc.start();
+                osc.stop(audioCtx.currentTime + length);
+            } catch(e) {
+                console.log("Click the screen first!");
+            }
+        }
+
+        function addPoint() {
+            score = score + pointsPerClick;
+            document.getElementById("score-text").innerText = "Score: " + score;
+            makeArcadeSound(523, 0.08);
+        }
+
+        function checkCode() {
+            let typedText = document.getElementById("code-input").value;
+            
+            if (typedText === "999") {
+                pointsPerClick = 100;
+                
+                makeArcadeSound(523, 0.15);
+                setTimeout(() => makeArcadeSound(659, 0.15), 100);
+                setTimeout(() => makeArcadeSound(784, 0.3), 200);
+
+                document.body.style.backgroundColor = "#1e272e";
+                document.getElementById("box").style.backgroundColor = "#3d3d3d";
+                document.getElementById("box").style.color = "#00d2d3";
+                alert("🔓 CHEAT UNLOCKED! +100 points per click!");
+            }
+        }
+    </script>
+
+</body>
+</html>
