@@ -1,18 +1,22 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Matrix Clicker Quest</title>
+    <title>Ultimate Cyber Clicker</title>
     <style>
+        /* 🎨 Beautiful Gradient Start Visuals */
         body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f0f8ff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #74b9ff, #a29bfe);
+            min-height: 100vh;
             text-align: center;
-            padding-top: 30px;
             margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             overflow: hidden;
-            transition: background-color 1s;
+            transition: background 1s;
         }
-        /* 🕶️ The Secret Matrix Background Canvas */
         #matrix-canvas {
             position: fixed;
             top: 0;
@@ -23,98 +27,120 @@
             display: none;
         }
         .game-box {
-            background-color: white;
-            width: 340px;
-            margin: 0 auto;
+            background-color: rgba(255, 255, 255, 0.95);
+            width: 360px;
             padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0px 5px 15px rgba(0,0,0,0.1);
+            border-radius: 24px;
+            box-shadow: 0px 15px 35px rgba(0,0,0,0.15);
             position: relative;
             z-index: 10;
             transition: all 0.5s;
+            border: 3px solid transparent;
         }
         .shop-box {
             background-color: #f1f2f6;
             margin-top: 20px;
             padding: 15px;
-            border-radius: 10px;
+            border-radius: 16px;
             text-align: left;
+            max-height: 260px;
+            overflow-y: auto;
             transition: all 0.5s;
         }
+        h1 { margin-top: 0; color: #2d3436; font-size: 28px; }
         button {
-            background-color: #ff4757;
+            background: linear-gradient(135deg, #ff4757, #ff6b81);
             color: white;
             border: none;
-            padding: 12px 25px;
-            font-size: 16px;
-            border-radius: 10px;
+            padding: 14px;
+            font-size: 18px;
+            border-radius: 12px;
             cursor: pointer;
             font-weight: bold;
             width: 100%;
             margin-bottom: 10px;
-            transition: transform 0.1s;
+            box-shadow: 0 4px 10px rgba(255,71,87,0.3);
+            transition: transform 0.1s, box-shadow 0.2s;
         }
-        button:active {
-            transform: scale(0.96);
-        }
+        button:active { transform: scale(0.96); }
         .shop-btn {
-            background-color: #2ed573;
-            font-size: 14px;
-            padding: 8px;
+            background: linear-gradient(135deg, #2ed573, #7bed9f);
+            font-size: 13px;
+            padding: 10px;
+            box-shadow: 0 3px 6px rgba(46,213,115,0.2);
         }
         input {
             margin-top: 15px;
-            padding: 8px;
+            padding: 10px;
             text-align: center;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-            width: 80%;
+            border-radius: 8px;
+            border: 2px solid #dfe4ea;
+            width: 85%;
             font-weight: bold;
+        }
+        /* ⚡ Glitchy Go Back Button Animation */
+        .glitch-btn {
+            display: none;
+            background: #00ff66;
+            color: black;
+            animation: glitch 1.5s infinite;
+            border: 2px solid white;
+        }
+        @keyframes glitch {
+            0% { transform: translate(0) skew(0deg); background-color: #00ff66; }
+            20% { transform: translate(-2px, 2px) skew(-4deg); background-color: #ff0055; }
+            40% { transform: translate(2px, -2px) skew(4deg); background-color: #00e5ff; }
+            60% { transform: translate(-1px, -1px) skew(-2deg); background-color: #9900ff; }
+            80% { transform: translate(2px, 1px) skew(0deg); background-color: #00ff66; }
+            100% { transform: translate(0) skew(0deg); }
         }
     </style>
 </head>
 <body>
 
-    <!-- This canvas draws the falling code effect -->
     <canvas id="matrix-canvas"></canvas>
 
     <div class="game-box" id="box">
-        <h1 id="title-text">Super Clicker!</h1>
+        <h1 id="title-text">✨ Cosmic Clicker</h1>
         <h2 id="score-text">Score: 0</h2>
-        <p id="stats-text">Click Power: +1 | Auto-Bots: 0</p>
+        <p id="stats-text" style="color:#57606f; font-weight:bold;">Click Power: +1 | CPS: 0</p>
         
         <button id="main-btn" onclick="addPoint()">CLICK ME!</button>
         
         <div class="shop-box" id="shop">
-            <h3>🛒 Upgrade Shop</h3>
-            <button class="shop-btn" id="upgrade-click-btn" onclick="buyClickUpgrade()">
-                +2 Click Power (Cost: 15)
-            </button>
-            <button class="shop-btn" id="upgrade-bot-btn" onclick="buyBotUpgrade()">
-                Buy Auto-Bot (Cost: 30)
-            </button>
+            <h3 style="margin-top:0;">🛒 Upgrade Shop</h3>
+            <button class="shop-btn" id="click1" onclick="buyUpgrade('click', 2, 15, 'click1')">+2 Click Power (Cost: 15)</button>
+            <button class="shop-btn" id="bot1" onclick="buyUpgrade('bot', 1, 30, 'bot1')">Auto-Clicker Bot (+1 CPS) (Cost: 30)</button>
+            <button class="shop-btn" id="click2" onclick="buyUpgrade('megaClick', 10, 150, 'click2')">💥 Mega Click (+10 Power) (Cost: 150)</button>
+            <button class="shop-btn" id="bot2" onclick="buyUpgrade('farm', 8, 400, 'bot2')">🚀 Clicker Rocket (+8 CPS) (Cost: 400)</button>
+            <button class="shop-btn" id="bot3" onclick="buyUpgrade('matrixBot', 50, 2000, 'bot3')">🌌 Quantum Reactor (+50 CPS) (Cost: 2000)</button>
         </div>
+
+        <button class="glitch-btn" id="back-btn" onclick="triggerReboot()">⚠️ DEBOOT SYSTEM ⚠️</button>
 
         <p id="cheat-prompt">Got a cheat code?</p>
         <input type="text" id="code-input" placeholder="Enter code..." oninput="checkCode()">
+        <p style="font-size:10px; color:#a4b0be; cursor:pointer;" onclick="toggleMusic()">🎵 Toggle Music</p>
     </div>
 
     <script>
         let score = 0;
         let pointsPerClick = 1;
-        let clickUpgradeCost = 15;
-        let autoBots = 0;
-        let botCost = 30;
+        let autoCPS = 0;
         let matrixActive = false;
+        let musicContext = null, musicInterval = null;
 
-        function makeArcadeSound(pitch, length) {
+        // Upgrade data trackers
+        let costs = { click1: 15, bot1: 30, click2: 155, bot2: 400, bot3: 2000 };
+
+        function makeArcadeSound(pitch, length, type='triangle') {
             try {
                 let audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                 let osc = audioCtx.createOscillator();
                 let volume = audioCtx.createGain();
-                osc.type = 'triangle';
+                osc.type = type;
                 osc.frequency.setValueAtTime(pitch, audioCtx.currentTime);
-                volume.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                volume.gain.setValueAtTime(0.12, audioCtx.currentTime);
                 volume.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + length);
                 osc.connect(volume);
                 volume.connect(audioCtx.destination);
@@ -123,128 +149,92 @@
             } catch(e) {}
         }
 
+        // 🎵 SCI-FI MUSIC ENGINE BLOCK
+        function toggleMusic() {
+            if (musicInterval) {
+                clearInterval(musicInterval);
+                musicInterval = null;
+                return;
+            }
+            let notes =; // Sweet low techno arpeggio
+            let beat = 0;
+            musicInterval = setInterval(() => {
+                let pitch = matrixActive ? notes[beat % notes.length] * 0.5 : notes[beat % notes.length];
+                makeArcadeSound(pitch, 0.25, 'sine');
+                beat++;
+            }, 350);
+        }
+
         function updateScreen() {
             document.getElementById("score-text").innerText = "Score: " + score;
-            document.getElementById("stats-text").innerText = "Click Power: +" + pointsPerClick + " | Auto-Bots: " + autoBots;
-            document.getElementById("upgrade-click-btn").innerText = "+2 Click Power (Cost: " + clickUpgradeCost + ")";
-            document.getElementById("upgrade-bot-btn").innerText = "Buy Auto-Bot (Cost: " + botCost + ")";
+            document.getElementById("stats-text").innerText = "Click Power: +" + pointsPerClick + " | CPS: " + autoCPS;
+            document.getElementById("click1").innerText = "+2 Click Power (Cost: " + costs.click1 + ")";
+            document.getElementById("bot1").innerText = "Auto-Clicker Bot (+1 CPS) (Cost: " + costs.bot1 + ")";
+            document.getElementById("click2").innerText = "💥 Mega Click (+10 Power) (Cost: " + costs.click2 + ")";
+            document.getElementById("bot2").innerText = "🚀 Clicker Rocket (+8 CPS) (Cost: " + costs.bot2 + ")";
+            document.getElementById("bot3").innerText = "🌌 Quantum Reactor (+50 CPS) (Cost: " + costs.bot3 + ")";
         }
 
         function addPoint() {
-            score = score + pointsPerClick;
-            makeArcadeSound(matrixActive ? 800 : 523, 0.08); 
+            score += pointsPerClick;
+            makeArcadeSound(matrixActive ? 700 : 523, 0.08);
             updateScreen();
         }
 
-        function buyClickUpgrade() {
-            if (score >= clickUpgradeCost) {
-                score = score - clickUpgradeCost;
-                pointsPerClick = pointsPerClick + 2;
-                clickUpgradeCost = Math.round(clickUpgradeCost * 1.5);
-                makeArcadeSound(880, 0.15);
+        function buyUpgrade(type, value, baseCost, id) {
+            if (score >= costs[id]) {
+                score -= costs[id];
+                if (type === 'click' || type === 'megaClick') pointsPerClick += value;
+                if (type === 'bot' || type === 'farm' || type === 'matrixBot') autoCPS += value;
+                costs[id] = Math.round(costs[id] * 1.45);
+                makeArcadeSound(650, 0.15, 'sawtooth');
                 updateScreen();
             } else {
-                alert("❌ Not enough points!");
+                alert("❌ Missing required core points!");
             }
         }
 
-        function buyBotUpgrade() {
-            if (score >= botCost) {
-                score = score - botCost;
-                autoBots = autoBots + 1;
-                botCost = Math.round(botCost * 1.5);
-                makeArcadeSound(880, 0.15);
-                updateScreen();
-            } else {
-                alert("❌ Not enough points!");
-            }
-        }
-
-        // Auto-Clicker loop
-        setInterval(function() {
-            if (autoBots > 0) {
-                score = score + autoBots;
-                makeArcadeSound(matrixActive ? 400 : 350, 0.04);
+        // CPS Game Timer
+        setInterval(() => {
+            if (autoCPS > 0) {
+                score += autoCPS;
+                makeArcadeSound(matrixActive ? 220 : 330, 0.03, 'sine');
                 updateScreen();
             }
         }, 1000);
 
-        // 🟢 MATRIX FALLING CODE ENGINE
+        // Matrix Falling Rain Effect
+        let matrixIntervalId = null;
         function startMatrixAnimation() {
             const canvas = document.getElementById("matrix-canvas");
             const ctx = canvas.getContext("2d");
-
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-
-            const alphabet = "01ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$#@+=-%*";
+            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+            const alphabet = "0101010101010101💻👾☠️🔓";
             const fontSize = 16;
             const columns = canvas.width / fontSize;
-
-            const rainDrops = [];
-            for (let x = 0; x < columns; x++) {
-                rainDrops[x] = 1;
-            }
+            const rainDrops = Array(Math.floor(columns)).fill(1);
 
             function draw() {
-                ctx.fillStyle = "rgba(0, 0, 0, 0.05)"; // Leaves a trail
+                ctx.fillStyle = "rgba(0, 0, 0, 0.06)";
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-                ctx.fillStyle = "#0F0"; // Matrix Green text
+                ctx.fillStyle = "#00ff66";
                 ctx.font = fontSize + "px monospace";
-
                 for (let i = 0; i < rainDrops.length; i++) {
-                    const text = alphabet.charAt(Math.floor(random(0, alphabet.length)));
+                    const text = alphabet.charAt(Math.floor(Math.random() * alphabet.length));
                     ctx.fillText(text, i * fontSize, rainDrops[i] * fontSize);
-
-                    if (rainDrops[i] * fontSize > canvas.height && Math.random() > 0.975) {
-                        rainDrops[i] = 0;
-                    }
+                    if (rainDrops[i] * fontSize > canvas.height && Math.random() > 0.975) rainDrops[i] = 0;
                     rainDrops[i]++;
                 }
             }
-            
-            function random(min, max) {
-                return Math.random() * (max - min) + min;
-            }
-
-            setInterval(draw, 30);
+            matrixIntervalId = setInterval(draw, 33);
         }
 
         function checkCode() {
-            let typedText = document.getElementById("code-input").value;
-            if (typedText === "999" && !matrixActive) {
+            if (document.getElementById("code-input").value === "999" && !matrixActive) {
                 matrixActive = true;
-                pointsPerClick = 100;
-                score = score + 5000; // Gives huge points!
-
-                // Play hacker sound sequence
-                makeArcadeSound(400, 0.2);
-                setTimeout(() => makeArcadeSound(600, 0.2), 150);
-                setTimeout(() => makeArcadeSound(900, 0.4), 300);
-
-                // Transform game UI to Dark Neon Cyberpunk style
-                document.body.style.backgroundColor = "black";
+                pointsPerClick = 500;
+                score += 10000;
+                makeArcadeSound(200, 0.4, 'sawtooth');
+                
+                document.body.style.background = "black";
                 document.getElementById("matrix-canvas").style.display = "block";
-                
-                let box = document.getElementById("box");
-                box.style.backgroundColor = "rgba(15, 15, 15, 0.9)";
-                box.style.color = "#00ff66";
-                box.style.boxShadow = "0px 0px 30px #00ff66";
-                box.style.border = "2px solid #00ff66";
-
-                document.getElementById("shop").style.backgroundColor = "#222";
-                document.getElementById("main-btn").style.backgroundColor = "#00ff66";
-                document.getElementById("main-btn").style.color = "black";
-                document.getElementById("title-text").innerText = " mainframe HACKED ";
-                
-                document.getElementById("code-input").style.display = "none";
-                document.getElementById("cheat-prompt").style.display = "none";
-
-                startMatrixAnimation();
-                updateScreen();
-            }
-        }
-    </script>
-</body>
-</html>
