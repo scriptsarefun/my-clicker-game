@@ -120,7 +120,7 @@
 
         <p id="cheat-prompt">Got a cheat code?</p>
         <input type="text" id="code-input" placeholder="Enter code..." oninput="checkCode()">
-        <p style="font-size:10px; color:#a4b0be; cursor:pointer;" onclick="toggleMusic()">🎵 Toggle Music</p>
+        <p style="font-size:12px; color:#57606f; cursor:pointer; margin-top:15px; font-weight:bold;" onclick="toggleMusic()">🎵 Click to Start/Stop Music</p>
     </div>
 
     <script>
@@ -128,10 +128,9 @@
         let pointsPerClick = 1;
         let autoCPS = 0;
         let matrixActive = false;
-        let musicContext = null, musicInterval = null;
+        let musicInterval = null;
 
-        // Upgrade data trackers
-        let costs = { click1: 15, bot1: 30, click2: 155, bot2: 400, bot3: 2000 };
+        let costs = { click1: 15, bot1: 30, click2: 150, bot2: 400, bot3: 2000 };
 
         function makeArcadeSound(pitch, length, type='triangle') {
             try {
@@ -140,7 +139,7 @@
                 let volume = audioCtx.createGain();
                 osc.type = type;
                 osc.frequency.setValueAtTime(pitch, audioCtx.currentTime);
-                volume.gain.setValueAtTime(0.12, audioCtx.currentTime);
+                volume.gain.setValueAtTime(0.08, audioCtx.currentTime);
                 volume.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + length);
                 osc.connect(volume);
                 volume.connect(audioCtx.destination);
@@ -149,20 +148,20 @@
             } catch(e) {}
         }
 
-        // 🎵 SCI-FI MUSIC ENGINE BLOCK
+        // 🎵 FIXED MUSIC ENGINE BLOCK
         function toggleMusic() {
             if (musicInterval) {
                 clearInterval(musicInterval);
                 musicInterval = null;
                 return;
             }
-            let notes =; // Sweet low techno arpeggio
+            let notes =; // Clean audio notes array
             let beat = 0;
             musicInterval = setInterval(() => {
                 let pitch = matrixActive ? notes[beat % notes.length] * 0.5 : notes[beat % notes.length];
-                makeArcadeSound(pitch, 0.25, 'sine');
+                makeArcadeSound(pitch, 0.2, 'sine');
                 beat++;
-            }, 350);
+            }, 300);
         }
 
         function updateScreen() {
